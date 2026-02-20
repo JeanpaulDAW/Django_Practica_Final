@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "27797713-e52f-4ce2-9ad1-481b7041f01c",
+		"name": "django-persistencia",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5465524"
+	},
+	"item": [
+		{
+			"name": "pizzas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/pizzas/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"pizzas",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "pizzas",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\": \"margarita\",\n    \"precio\": 10.5,\n    \"toppings\": [1, 2]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/pizzas/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"pizzas",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "toppings",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost:8000/toppings/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"toppings",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "toppings",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"nombre\": \"tomate\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8000/toppings/",
+					"host": [
+						"localhost"
+					],
+					"port": "8000",
+					"path": [
+						"toppings",
+						""
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

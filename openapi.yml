@@ -1,0 +1,317 @@
+openapi: 3.0.3
+info:
+  title: API de Gestión de Pedidos - Django Persistencia
+  description: >
+    Documentación de la API para la práctica de persistencia en Django.
+    
+    Esta especificación define los endpoints que ya existen y los que **debes implementar**.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Servidor de desarrollo local
+
+paths:
+  # --------------------------------------------------------------------------
+  # Endpoints Existentes (Referencia)
+  # --------------------------------------------------------------------------
+  /toppings/:
+    get:
+      summary: Listar ingredientes (Toppings)
+      tags:
+        - Toppings
+      responses:
+        '200':
+          description: Lista de toppings recuperada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  toppings:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Topping'
+    post:
+      summary: Crear un nuevo ingrediente
+      tags:
+        - Toppings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+              properties:
+                nombre:
+                  type: string
+                  example: "Champiñones"
+      responses:
+        '201':
+          description: Topping creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Topping'
+        '400':
+          description: Datos inválidos.
+
+  /pizzas/:
+    get:
+      summary: Listar pizzas
+      tags:
+        - Pizzas
+      responses:
+        '200':
+          description: Lista de pizzas recuperada correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pizzas:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Pizza'
+    post:
+      summary: Crear una nueva pizza
+      tags:
+        - Pizzas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+                - precio
+              properties:
+                nombre:
+                  type: string
+                  example: "Margarita"
+                precio:
+                  type: number
+                  format: float
+                  example: 10.50
+                toppings:
+                  type: array
+                  items:
+                    type: integer
+                  example: [1, 2]
+      responses:
+        '201':
+          description: Pizza creada exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pizza'
+        '400':
+          description: Datos inválidos.
+
+  # --------------------------------------------------------------------------
+  # Endpoints a Implementar (Tu Tarea)
+  # --------------------------------------------------------------------------
+  /clientes/:
+    get:
+      summary: "[TAREA] Listar clientes"
+      description: Debe devolver un JSON con la clave "clientes" conteniendo la lista.
+      tags:
+        - Clientes
+      responses:
+        '200':
+          description: Lista de clientes.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  clientes:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cliente'
+    post:
+      summary: "[TAREA] Crear un nuevo cliente"
+      description: Debe validar que 'nombre' y 'email' estén presentes. 'email' debe ser único.
+      tags:
+        - Clientes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - nombre
+                - email
+              properties:
+                nombre:
+                  type: string
+                  example: "Juan Pérez"
+                email:
+                  type: string
+                  format: email
+                  example: "juan@example.com"
+                telefono:
+                  type: string
+                  example: "600123456"
+      responses:
+        '201':
+          description: Cliente creado. Devuelve el objeto creado.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Cliente'
+        '400':
+          description: Error de validación (faltan campos o email duplicado).
+
+  /pedidos/:
+    get:
+      summary: "[TAREA] Listar pedidos"
+      description: >
+        Debe devolver un JSON con la clave "pedidos". 
+        Cada pedido debe incluir su 'total' calculado sumando el precio de sus pizzas.
+      tags:
+        - Pedidos
+      responses:
+        '200':
+          description: Lista de pedidos con totales calculados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pedidos:
+                    type: array
+                    items:
+                      allOf:
+                        - $ref: '#/components/schemas/Pedido'
+                        - type: object
+                          properties:
+                            total:
+                              type: number
+                              format: float
+                              description: Suma del precio de todas las pizzas del pedido.
+                              example: 25.50
+    post:
+      summary: "[TAREA] Crear un nuevo pedido"
+      description: >
+        Crea un pedido asociado a un cliente y una lista de pizzas.
+        Valida que existan el cliente y las pizzas.
+      tags:
+        - Pedidos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - cliente
+                - pizzas
+                - direccion_entrega
+              properties:
+                cliente:
+                  type: integer
+                  description: ID del cliente que realiza el pedido.
+                  example: 1
+                pizzas:
+                  type: array
+                  description: Lista de IDs de las pizzas.
+                  items:
+                    type: integer
+                  example: [1, 3]
+                direccion_entrega:
+                  type: string
+                  example: "Calle Principal 123"
+      responses:
+        '201':
+          description: Pedido creado exitosamente.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pedido'
+        '400':
+          description: Error de validación (cliente no existe, pizzas no existen, etc).
+
+components:
+  schemas:
+    Topping:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Queso"
+
+    Pizza:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Margarita"
+        precio:
+          type: string
+          description: El precio se devuelve como string para preservar decimales (DecimalField).
+          example: "10.50"
+        toppings:
+          type: array
+          items:
+            type: integer
+          description: IDs de los ingredientes
+          example: [1, 2]
+
+    Cliente:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Juan Pérez"
+        email:
+          type: string
+          format: email
+          example: "juan@example.com"
+        telefono:
+          type: string
+          nullable: true
+          example: "600123456"
+        fecha_alta:
+          type: string
+          format: date
+          example: "2023-10-27"
+
+    Pedido:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        cliente:
+          type: integer
+          description: ID del cliente
+          example: 1
+        pizzas:
+          type: array
+          items:
+            type: integer
+          description: IDs de las pizzas incluidas
+          example: [1, 3]
+        direccion_entrega:
+          type: string
+          example: "Calle Principal 123"
+        fecha_pedido:
+          type: string
+          format: date-time
+          example: "2023-10-27T10:00:00Z"
+        estado:
+          type: string
+          example: "Pendiente"
