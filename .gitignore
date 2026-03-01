@@ -5,3 +5,6 @@ __pycache__/
 mysql_data/
 db.sqlite3
 solucion.md
+.idea/
+*.sqlite3
+.env

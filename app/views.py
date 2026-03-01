@@ -1,6 +1,7 @@
 from django.http import JsonResponse
-from .models import Pizza, Topping
+from .models import Cliente, Pedido, Pizza, Topping
 from django.views.decorators.csrf import csrf_exempt
+from django.forms.models import model_to_dict
 import json
 
 
@@ -59,4 +60,126 @@ def pizzas_view(request):
             status=201,
         )
 
+
     return JsonResponse({"error": "Método no soportado"}, status=405)
+
+
+@csrf_exempt
+def toppings_view(request):
+
+    if request.method == "GET":
+        toppings = Topping.objects.all()
+
+        data = []
+        for topping in toppings:
+            data.append({
+                "id": topping.id,
+                "nombre": topping.nombre,
+                "es_vegetariano": topping.es_vegetariano
+            })
+
+        return JsonResponse(data, safe=False, status=200)
+
+
+    if request.method == "POST":
+        data = json.loads(request.body)
+
+        nombre = data.get("nombre")
+        es_vegetariano = data.get("es_vegetariano")
+
+        if not nombre or es_vegetariano is None:
+            return JsonResponse(
+                {"error": "Los campos 'nombre' y 'es_vegetariano' son obligatorios"},
+                status=400
+            )
+
+        topping = Topping.objects.create(
+            nombre=nombre,
+            es_vegetariano=es_vegetariano
+        )
+
+        return JsonResponse(
+            {
+                "id": topping.id,
+                "nombre": topping.nombre,
+                "es_vegetariano": topping.es_vegetariano
+            },
+            status=201
+        )
+
+    return JsonResponse(
+        {"error": "Método no soportado"},
+        status=405
+    )
+
+
+@csrf_exempt
+def clientes_view(request):
+    if request.method == "GET":
+        clientes = Cliente.objects.all()
+        data = [model_to_dict(cliente) for cliente in clientes]
+        return JsonResponse(data, safe=False, status=200)
+
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+
+            cliente = Cliente.objects.create(
+                nombre=body["nombre"],
+                email=body["email"],
+                telefono=body.get("telefono", "")
+            )
+
+            return JsonResponse(
+                model_to_dict(cliente),
+                status=201
+            )
+
+        except Exception:
+            return JsonResponse(
+                {"error": "Datos inválidos"},
+                status=400
+            )
+
+@csrf_exempt
+def pedidos_view(request):
+    if request.method == "GET":
+        pedidos = Pedido.objects.all()
+        data = []
+
+        for pedido in pedidos:
+            pedido_dict = model_to_dict(pedido)
+            pedido_dict["pizzas"] = list(
+                pedido.pizzas.values_list("id", flat=True)
+            )
+            pedido_dict["total"] = str(pedido.calcular_total())
+            data.append(pedido_dict)
+
+        return JsonResponse(data, safe=False, status=200)
+
+    if request.method == "POST":
+        try:
+            body = json.loads(request.body)
+
+            cliente = Cliente.objects.get(id=body["cliente"])
+            pedido = Pedido.objects.create(
+                cliente=cliente,
+                direccion_entrega=body["direccion_entrega"]
+            )
+
+            pizzas = Pizza.objects.filter(id__in=body["pizzas"])
+            pedido.pizzas.set(pizzas)
+
+            pedido_dict = model_to_dict(pedido)
+            pedido_dict["pizzas"] = list(
+                pedido.pizzas.values_list("id", flat=True)
+            )
+            pedido_dict["total"] = str(pedido.calcular_total())
+
+            return JsonResponse(pedido_dict, status=201)
+
+        except Exception:
+            return JsonResponse(
+                {"error": "Datos inválidos"},
+                status=400
+            )

@@ -9,7 +9,7 @@ from app.models import Pizza, Topping, Proveedor
 # --- CONFIGURACIÓN OBLIGATORIA ---
 # El alumno debe poner aquí su usuario de GitHub o un identificador único.
 # Esto es fundamental para que los datos de prueba generados sean únicos.
-GITHUB_USERNAME = "tu_usuario_aqui"  # <-- SUSTITUIR POR TU USUARIO DE GITHUB
+GITHUB_USERNAME = "JeanpaulDAW"  # <-- SUSTITUIR POR TU USUARIO DE GITHUB
 
 
 class PracticaTestBase(TestCase):
